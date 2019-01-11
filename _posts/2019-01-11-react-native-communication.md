@@ -11,6 +11,9 @@ author: shanks
 ---
 
 ## 准备-JavaScriptCore
+在开篇，我们先简单准备下JavaScriptCore的知识。这是整个Native和JS沟通的最底层的桥梁。
+
+<!--more-->
 
 ***Classes***
 - JSContext <br>
@@ -41,10 +44,9 @@ JavaScript值的引用，转换JavaScript和Native之间的基本数据<br>
 
 ## ReactNative通信原理
 
-
 从ReactNative的demo开始，入口我们只看到两个东西RCTRootView和RCTBridge。RCTRootView负责展示，RCTBridge则和ReactNative的通信有关。
 
-***入口***
+### 入口
 
 ```
 - (BOOL)application:(__unused UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -65,7 +67,7 @@ JavaScript值的引用，转换JavaScript和Native之间的基本数据<br>
   return YES;
 }
 ```
-***RCTCxxBridge初始化***
+### RCTCxxBridge初始化
 
 跟着调用链会看到，bridge的初始化会走到RCTCxxBridge中的start
 ```
@@ -113,7 +115,7 @@ JavaScript值的引用，转换JavaScript和Native之间的基本数据<br>
 
 要想了解native modules的初始化，我们要先看下之前的准备工作。
 
-***native modules导出模块***
+### native modules导出模块
 
 通过RCT_EXPORT_MODULE将本地的模块导出供JS使用
 
@@ -148,7 +150,7 @@ NSArray<Class> *RCTGetModuleClasses(void) {
 }
 ```
 
-***native modules导出方法***
+### native modules导出方法
 
 ```
 //RCTBridgeModule.h
@@ -188,7 +190,7 @@ typedef struct RCTMethodInfo {
 }
 ```
 
-***生成RCTModuleData***
+### 生成RCTModuleData
 
 初始化native modules的工作，其实就是根据之前导出的类和方法，生成对应的RCTModuleData对象。
 
@@ -216,7 +218,7 @@ typedef struct RCTMethodInfo {
 ```
 至此，我们完成了本地模块和方法的导出，并且生成了一组RCTModuleData对象来表示他们。
 
-***初始化Instance***
+### 初始化Instance
 
 我们继续看Instance的初始化。
 
@@ -420,10 +422,9 @@ std::vector<std::unique_ptr<NativeModule>> createNativeModules(NSArray<RCTModule
 
  ```
 
-
 同时我们看到Instance::initializeBridge中生成了NativeToJsBridge，到这里Instance的初始化就结束了，下面进入NativeToJsBridge。
 
-***NativeToJsBridge***
+### NativeToJsBridge
 
 NativeToJsBridge作用主要是桥接Native和JS，它包含几个关键属性
 - &lt;JsToNativeBridge&gt; m_delegate
@@ -456,7 +457,7 @@ std::shared_ptr<JSExecutorFactory> executorFactory;
 - &lt;MessageQueueThread&gt; m_executorMessageQueueThread
   MessageQueueThread类型引用，由上层传递，用于队列管理
 
-***JSIExecutor***
+### JSIExecutor
 
 JSIExecutor主要用来Native call JS，包含几个主要属性：
 - &lt;jsi::Runtime&gt; runtime_ 
@@ -578,7 +579,7 @@ callFunctionReturnFlushedQueue(module: string, method: string, args: any[]) {
 可以看到callFunctionReturnFlushedQueue_会调用JS端的callFunctionReturnFlushedQueue方法，最终调用在JS端注册好的JS模块和方法。
 而getPropertyAsFunction则是通过runtime来实现。（runtime是JS和Native沟通的桥梁）
 
-***JsToNativeBridge***
+### JsToNativeBridge
 
 JsToNativeBridge的实现就简单很多，直接通过ModuleRegistry注册好的native信息，调用对应模块的对应方法。
 
@@ -603,7 +604,6 @@ void callNativeModules(
 
 那JS Call Native的整套流程是怎样的呢？
 
-
  - JS调用MessageQueue.enqueueNativeCall
 ```
 enqueueNativeCall(
