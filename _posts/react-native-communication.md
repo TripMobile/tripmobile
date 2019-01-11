@@ -669,6 +669,6 @@ delegate_就是我们上面提到的&lt;ExecutorDelegate&gt;类型指针，实�
 
 到这里，我们已经具备了native call js和js call native的能力。
 
-##总结
+## 总结
 
 ![UML图](/assets/uml.jpg)
