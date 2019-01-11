@@ -671,4 +671,5 @@ delegate_就是我们上面提到的&lt;ExecutorDelegate&gt;类型指针，实�
 
 ## 总结
 
-![UML图](/assets/uml.jpg)
+<a href="/assets/uml.jpg"><img src="/assets/uml.jpg"></a>
+<!-- ![UML图](/assets/uml.jpg) -->
