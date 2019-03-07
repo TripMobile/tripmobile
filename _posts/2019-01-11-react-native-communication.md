@@ -48,7 +48,7 @@ JavaScript值的引用，转换JavaScript和Native之间的基本数据<br>
 
 ### 入口
 
-```
+```objc
 - (BOOL)application:(__unused UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
   _bridge = [[RCTBridge alloc] initWithDelegate:self
                                   launchOptions:launchOptions];
@@ -70,7 +70,7 @@ JavaScript值的引用，转换JavaScript和Native之间的基本数据<br>
 ### RCTCxxBridge初始化
 
 跟着调用链会看到，bridge的初始化会走到RCTCxxBridge中的start
-```
+```objc
 //RCTCxxBrige.mm
 //只贴了关键代码
 - (void)start {
@@ -119,7 +119,7 @@ JavaScript值的引用，转换JavaScript和Native之间的基本数据<br>
 
 通过RCT_EXPORT_MODULE将本地的模块导出供JS使用
 
-```
+```objc
 //RCTBridgeModule.h
 #define RCT_EXPORT_MODULE(js_name) \
 RCT_EXTERN void RCTRegisterModule(Class); \
@@ -139,7 +139,7 @@ void RCTRegisterModule(Class moduleClass) {
 ```
 
 最终导出的模块会被保存到RCTModuleClasses，使用时通过RCTGetModuleClasses()获取。RCTGetModuleClasses()就是在上面初始化native modules时用到的。
-```
+```objc
 //RCTBridge.m
 NSArray<Class> *RCTGetModuleClasses(void) {
   __block NSArray<Class> *result;
@@ -152,7 +152,7 @@ NSArray<Class> *RCTGetModuleClasses(void) {
 
 ### native modules导出方法
 
-```
+```objc
 //RCTBridgeModule.h
 #define RCT_EXPORT_METHOD(method) \
   RCT_REMAP_METHOD(, method)
@@ -172,7 +172,7 @@ NSArray<Class> *RCTGetModuleClasses(void) {
 将方法导出，最终生成以下方法提供给外部调用。通过遍历这个类中所有以
 "\_\_rct_export\_\_"开头的方法就可以获取属于这个类的所有导出方法。
 
-```
+```objc
 //RCTBridgeModule.h
 typedef struct RCTMethodInfo {
   const char *const jsName;
@@ -194,7 +194,7 @@ typedef struct RCTMethodInfo {
 
 初始化native modules的工作，其实就是根据之前导出的类和方法，生成对应的RCTModuleData对象。
 
-```
+```objc
 //RCTCxxBridge.mm
 - (NSArray<RCTModuleData *> *)_registerModulesForClasses:(NSArray<Class> *)moduleClasses
                                         lazilyDiscovered:(BOOL)lazilyDiscovered {
@@ -222,7 +222,7 @@ typedef struct RCTMethodInfo {
 
 我们继续看Instance的初始化。
 
-```
+```objc
 // 初始化底层Instance
   dispatch_group_enter(prepareBridge);
   [self ensureOnJavaScriptThread:^{
@@ -267,7 +267,7 @@ void Instance::initializeBridge(
 
 初始化Instance需要一下几个元素：
 - InstanceCallback类型的回调，用于底层执行结束后往上层回调。
-```
+```objc
 struct InstanceCallback {
   virtual ~InstanceCallback() {}
   virtual void onBatchComplete() {}
@@ -278,7 +278,7 @@ struct InstanceCallback {
 
 - JSExecutorFactory类型的对象，用于生成JSExecutor用于真正执行JS。生产返回使用的是JSCExecutorFactory，返回JSIExecutor用于执行JS，调试使用的是RCTObjcExecutorFactory,返回RCTObjcExecutor通过websocket链接chrome执行JS。
 
-```
+```objc
 class JSExecutorFactory {
 public:
   virtual std::unique_ptr<JSExecutor> createJSExecutor(
@@ -317,7 +317,7 @@ std::unique_ptr<JSExecutor> RCTObjcExecutorFactory::createJSExecutor(
 
 - MessageQueueThread类型对象用于提供队列执行。这里是由RCTMessageThread来实现，内部用的是CFRunLoop来实现。
 
-```
+```objc
 //MessageQueueThread.h
 class MessageQueueThread {
  public:
@@ -342,7 +342,7 @@ _jsMessageThread = std::make_shared<RCTMessageThread>([NSRunLoop currentRunLoop]
 
 - ModuleRegistry，这个包含native module信息的对象，它的来源就是我们上面看到的RCTModuleData。可以看到最终透传参数生成了RCTNativeModule
 
-```
+```objc
 //RCTCxxBridge.mm
 - (std::shared_ptr<ModuleRegistry>)_buildModuleRegistryUnlocked {
   auto registry = std::make_shared<ModuleRegistry>(
@@ -371,7 +371,7 @@ std::vector<std::unique_ptr<NativeModule>> createNativeModules(NSArray<RCTModule
 }
 ```
 有必要提一下，这上面的moduleData.instance，其实就是生成这个模块对应实例
-```
+```objc
 - (instancetype)initWithModuleClass:(Class)moduleClass
                              bridge:(RCTBridge *)bridge
 {
@@ -381,7 +381,7 @@ std::vector<std::unique_ptr<NativeModule>> createNativeModules(NSArray<RCTModule
 }
 ```
 同时也会准备好它所对应的bridge和method queue
- ```
+```objc
  //RCTModuleData.mm
  - (void)setBridgeForInstance
 {
@@ -432,7 +432,7 @@ NativeToJsBridge作用主要是桥接Native和JS，它包含几个关键属性
 
 - &lt;JSExecutor&gt; m_executor
   JSExecutor类型引用，主要用于执行Native call JS，这里实际使用是的是JSIExecutor(生产)/RCTObjcExecutor(调试)
-```
+```objc
 std::shared_ptr<JSExecutorFactory> executorFactory;
   if (!self.executorClass) {
     if ([self.delegate conformsToProtocol:@protocol(RCTCxxBridgeDelegate)]) {
@@ -463,7 +463,7 @@ JSIExecutor主要用来Native call JS，包含几个主要属性：
 - &lt;jsi::Runtime&gt; runtime_ 
   Runtime类型指针，代表JS的运行时。这是一个抽象类，其实际上是由JSCRuntime来实现的，JSCRuntime中的功能其实就是通过JavaScriptCode来完成（使用的C函数接口）。JSCRuntime上线了&lt;jsi::Runtime&gt;接口，提供了创建JS上下文的功能，同时可以执行JS。
 
-```
+```objc
 void JSCRuntime::evaluateJavaScript(
     std::unique_ptr<const jsi::Buffer> buffer,
     const std::string& sourceURL) {
@@ -491,7 +491,7 @@ void JSCRuntime::evaluateJavaScript(
 - &lt;JSINativeModules&gt; nativeModules_
   JSINativeModules由上层传入的ModuleRegistry构造而成，同时会将ModuleRegistry中包含的本地模块配置信息通过"__fbGenNativeModule"保存到JS端。
 
-```
+```objc
 //JSINativeModules.cpp
 folly::Optional<Object> JSINativeModules::createModule(
     Runtime& rt,
@@ -515,7 +515,7 @@ global.__fbGenNativeModule = genModule;
 
 ```
 genModule会根据ModuleRegistry生成的module和method信息生成JS端的方法，结构类似：
-```
+```objc
 {
   name: moduleName,
   module: {
@@ -525,7 +525,7 @@ genModule会根据ModuleRegistry生成的module和method信息生�
 ```
 
 JSIExecutor执行js方法的实现值得说下。
-```
+```objc
 void JSIExecutor::callFunction(
     const std::string& moduleId,
     const std::string& methodId,
@@ -561,7 +561,7 @@ void JSIExecutor::callFunction(
 }
 ```
 其中callFunctionReturnFlushedQueue_来自和JS端的属性绑定
-```
+```objc
 //JSIExecutor.cpp
 Object batchedBridge = batchedBridgeValue.asObject(*runtime_);
 callFunctionReturnFlushedQueue_ = batchedBridge.getPropertyAsFunction(
@@ -583,7 +583,7 @@ callFunctionReturnFlushedQueue(module: string, method: string, args: any[]) {
 
 JsToNativeBridge的实现就简单很多，直接通过ModuleRegistry注册好的native信息，调用对应模块的对应方法。
 
-```
+```objc
 void callNativeModules(
       JSExecutor& executor, folly::dynamic&& calls, bool isEndOfBatch) override {
         
@@ -605,7 +605,7 @@ void callNativeModules(
 那JS Call Native的整套流程是怎样的呢？
 
  - JS调用MessageQueue.enqueueNativeCall
-```
+```objc
 enqueueNativeCall(
     moduleID: number,
     methodID: number,
@@ -632,7 +632,7 @@ enqueueNativeCall(
 可以看到5ms刷新一次
 
 - nativeFlushQueueImmediate对应本地的方法
-```
+```objc
 //JSIExecutor.cpp
 runtime_->global().setProperty(
       *runtime_,
@@ -658,7 +658,7 @@ runtime_->global().setProperty(
 这里值得一提的是，runtime_->global().setProperty用在很多将JS属性和native方法对象等绑定。
 
 - callNativeModules
-```
+```objc
 //JSIExecutor.cpp
 void JSIExecutor::callNativeModules(const Value& queue, bool isEndOfBatch) {
   delegate_->callNativeModules(

@@ -13,7 +13,7 @@ author: shanks
 ## 背景
 
 在使用ReactNative v0.51版本时，发现线上有个崩溃一直没有解决，为了完成App治理crash的目标，所以花了点时间研究如何解决这个问题。
-<!-- more -->
+<!--more-->
 
 ## Crash介绍
 
