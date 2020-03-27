@@ -30,4 +30,5 @@ gem "wdm", "~> 0.1.0" if Gem.win_platform?
 
 gem "jekyll-text-theme"
 
+gem "nokogiri", ">= 1.10.8"
 
