@@ -11,6 +11,7 @@ author: Trip Mobile Team
 ## 背景
 
 在 2019 年，随着 iOS 13 与 Android Q 的推出，Apple 和 Google 同时推出主打功能暗黑模式，分别为 Dark Mode(iOS)/Dark Theme(Android) ，下文我们统称为 Dark Theme。在前期预研中，我们发现 66% 的 iOS 13 用户选择打开Dark Theme，可见用户对暗黑模式的喜爱和期待。
+
 <!--more-->
 
 ![1@3x](/assets/darkmode/15842015791478/1@3x.jpg)
