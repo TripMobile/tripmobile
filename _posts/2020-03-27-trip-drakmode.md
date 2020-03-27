@@ -5,7 +5,7 @@ tags:
   - Darkmode
   - Design
 categories: Design
-author: Trip Mobile Team
+author: TripMobileTeam
 ---
 
 ## 背景
