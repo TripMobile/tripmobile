@@ -1,11 +1,11 @@
 ---
 title: 暗黑模式在 Trip.com App上的实践
-date: 2019-03-27 10:53:03
+date: 2020-03-27 10:53:03
 tags:
   - Darkmode
   - Design
 categories: Design
-author: mzy, qxx, yx, wj, jjj
+author: Trip Mobile Team
 ---
 
 ## 背景
