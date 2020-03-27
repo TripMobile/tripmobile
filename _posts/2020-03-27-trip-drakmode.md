@@ -1,3 +1,13 @@
+---
+title: 记一次ReactNative的多线程crash
+date: 2019-03-27 10:53:03
+tags:
+  - Darkmode
+  - Design
+categories: 
+author: mzy, qxx, yx, wj, jjj
+---
+
 # 暗黑模式在 Trip.com App上的实践
 ![1@3x](/assets/darkmode/15842015791478/1@3x.jpg)
 
